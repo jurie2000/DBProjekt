@@ -52,4 +52,8 @@ public class DbConnection {
     public String getUserid() {
         return userid;
     }
+
+    public Connection getConnection() {
+        return connection;
+    }
 }
