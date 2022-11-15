@@ -1,0 +1,25 @@
+** Menu **
+- Ausgeben
+- Einfügen
+- Ändern
+- Löschen
+
+** Menu | Ausgeben **
+-> Tabelle auswählen
+-> Fertig
+
+** Menu | Einfügen **
+-> Tabelle auswählen
+-> Werte eingeben
+-> Fertig
+
+** Menu | Ändern **
+-> Tabelle auswählen
+-> Spalte (Tupel) auswählen
+-> Wert eingeben
+-> Fertig
+
+** Menu | Löschen **
+-> Tabelle auswählen
+-> Spalte (Tupel) auswählen
+-> Fertig
