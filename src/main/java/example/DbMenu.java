@@ -122,16 +122,84 @@ public class DbMenu {
         mainMenu();
     }
 
-    public void bearbeiten() {
+    /**
+     * Author: Justin Riedel
+     * Verwaltet das bearbeiten von Daten
+     */
+    private void bearbeiten() {
+
+        DbConnection dbConnection = new DbConnection("jdbc:oracle:thin:@172.22.112.100:1521:fbpool", "C##FBPOOL164", "oracle");
+        DbOperation dbOperation = new DbOperation(dbConnection);
+
         // Tabelle auswählen
-        List<String> tabellen = new LinkedList<>(Arrays.asList("FAHRGAST", "MITARBEITER")); // ToDo Tabellen list
+        List<String> tabellen = dbOperation.getAllAvailableTables();
         ScannerBuilder scannerBuilder = new ScannerBuilder(tabellen);
         int eingabe = scannerBuilder.start();
         String tabelle = tabellen.get(eingabe);
 
-        // ToDo Datensatz auswählen
 
-        // ToDo Datenwert auswählen
+        // Tabellendaten holen
+        List<Map<String, Object>> values;
+        try {
+            values = dbOperation.getTuple(tabelle);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Tabellendaten ausgeben
+        System.out.println();
+        System.out.println("** Ausgabe **");
+        System.out.println();
+        for (int i = 0; i < values.size(); i++) {
+            System.out.println("** Datensatz ID [" + i + "] **");
+            for (String key : values.get(i).keySet()) {
+                System.out.println(key + ": " + values.get(i).get(key));
+            }
+            System.out.println();
+        }
+
+        Scanner scanner = new Scanner(System.in);
+        int datensatzID;
+
+        do {
+            try {
+                System.out.print("Eingabe: ");
+                datensatzID = scanner.nextInt();
+            } catch (Exception e) {
+                System.out.println("Ungültiger Wert");
+                scanner.next();
+                datensatzID = -1;
+            }
+        } while (datensatzID < 0 || datensatzID >= values.size());
+
+        List<String> columns;
+        Map<String, Object> neueWerteParre = new LinkedHashMap<>();
+        int wert;
+        Object neuerWert;
+        String repeat;
+
+        try {
+            columns = dbOperation.getAllAvailableColumns(tabelle);
+            do {
+                System.out.println("Wählen die die Nr von dem Wert welchen sie ändern möchten");
+                scannerBuilder = new ScannerBuilder(columns);
+                wert = scannerBuilder.start();
+
+                System.out.println("Wie lautet der neue Wert:");
+                neuerWert = scanner.next();
+
+                neueWerteParre.put(columns.get(wert), neuerWert);
+                System.out.println("Möchten sie weiter werte in diesem Datensatz ändern: [Y]: Yes | [N]: No");
+                repeat = scanner.next();
+            } while (repeat.equalsIgnoreCase("Y"));
+
+            dbOperation.updateTheDB(tabelle, values.get(datensatzID), neueWerteParre);
+
+        } catch (SQLException e) {
+            System.out.println("Wie es aussieht wurden ungültige Daten eingegeben.");
+        }
+        // Datenbank verbindung schließen
+        dbConnection.disconnectFromDb();
 
         // Zurück zum Hauptmenu
         mainMenu();

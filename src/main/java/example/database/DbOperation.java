@@ -12,6 +12,7 @@ public class DbOperation {
     }
 
     /**
+     * * Author: Justin Riedel, Niklas Wiemer
      * @param table - name of the table
      * @return a list off all tuples as Map - Key = ColumnName, Value = content
      * @throws SQLException
@@ -55,7 +56,10 @@ public class DbOperation {
     }
 
     /**
-     * @return a list of all tables by the user
+     * * Author: Justin Riedel
+     * Gibt alle verfügbaren Tabellen zurück
+     * @return  a list off all Tables names
+     * @throws SQLException
      */
 
     public List<String> getAllAvailableTables() {
@@ -125,4 +129,48 @@ public class DbOperation {
         statement.executeUpdate();
     }
 
+    /**
+     * Author: Justin Riedel
+     * Updatet einen Datensatz
+     * @param table
+     * @param primaryKey
+     * @param neueWertePaare
+     * @throws SQLException
+     */
+
+    public void updateTheDB(String table, Map<String, Object> primaryKey, Map<String, Object> neueWertePaare) throws SQLException {
+
+        StringBuilder sql = new StringBuilder();
+        StringBuilder sqlWhere = new StringBuilder();
+
+        int index = 0;
+        for (String key : neueWertePaare.keySet()) {
+            sql.append(key).append("=?");
+            if (index + 1 < neueWertePaare.size()) {
+                sql.append(", ");
+            }
+            index++;
+        }
+        index = 0;
+        for (String key : primaryKey.keySet()) {
+            sqlWhere.append(key).append("=?");
+            if (index + 1 < primaryKey.size()) {
+                sqlWhere.append(" AND ");
+            }
+            index++;
+        }
+
+        PreparedStatement statement = dbConnection.getConnection().prepareStatement("UPDATE " + table + " SET " + sql + " WHERE " + sqlWhere);
+        index = 1;
+
+        for (String key : neueWertePaare.keySet()) {
+            statement.setObject(index++, neueWertePaare.get(key));
+        }
+        for (String key : primaryKey.keySet()) {
+            statement.setObject(index++, primaryKey.get(key));
+        }
+
+        statement.executeUpdate();
+
+    }
 }
