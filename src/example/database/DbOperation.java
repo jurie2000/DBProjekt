@@ -1,12 +1,12 @@
-package org.example;
+package example.database;
 
 import java.sql.*;
 import java.util.*;
 
 public class DbOperation {
-    DbConnection dbConnection;
+    private final DbConnection dbConnection;
 
-    DbOperation(DbConnection dbConnection) {
+    public DbOperation(DbConnection dbConnection) {
         this.dbConnection = dbConnection;
         dbConnection.connectToDb();
     }
@@ -76,5 +76,39 @@ public class DbOperation {
         return list;
     }
 
+    public void insertToDB(String table, List<Object> content) throws SQLException {
+        StringBuilder sql = new StringBuilder();
+        for (int i = 0; i < content.size(); i++) {
+            sql.append("?");
+            if (i + 1 < content.size()) {
+                sql.append(", ");
+            }
+        }
+        PreparedStatement statement = dbConnection.getConnection().prepareStatement("INSERT INTO " + table + " VALUES(" + sql + ")");
+        for (int i = 0; i < content.size(); i++) {
+            statement.setObject(i + 1, content.get(i));
+        }
+        statement.executeUpdate();
+    }
+
+    public void deleteFromDB(String table, Map<String, Object> data) throws SQLException {
+        StringBuilder sql = new StringBuilder();
+
+        int index = 0;
+        for (String key : data.keySet()) {
+            sql.append(key).append("=?");
+            if (index + 1 < data.size()) {
+                sql.append(" AND ");
+            }
+            index++;
+        }
+
+        PreparedStatement statement = dbConnection.getConnection().prepareStatement("DELETE FROM " + table + " WHERE " + sql);
+        index = 1;
+        for (String key : data.keySet()) {
+            statement.setObject(index++, data.get(key));
+        }
+        statement.executeUpdate();
+    }
 
 }
