@@ -33,6 +33,14 @@ public class DbOperation {
         return list;
     }
 
+    /**
+     * * Author: Justin Riedel
+     * Gibt alle Spaltennamen der Tabelle zurück
+     * @param table
+     * @return  a list off all columns names
+     * @throws SQLException
+     */
+
     public List<String> getAllAvailableColumns(String table) throws SQLException {
         List<String> list = new LinkedList<>();
         PreparedStatement preparedStatement = dbConnection.getConnection().prepareStatement("SELECT * FROM " + table);
@@ -63,18 +71,13 @@ public class DbOperation {
         return list;
     }
 
-    public List<String> getAllAvailableDataTypes(String table) throws SQLException {
-        List<String> list = new LinkedList<>();
-        PreparedStatement preparedStatement = dbConnection.getConnection().prepareStatement("SELECT * FROM " + table);
-        try (ResultSet set = preparedStatement.executeQuery()) {
-            for (int i = 0; i < set.getMetaData().getColumnCount(); i++) {
-                list.add(String.valueOf(set.getMetaData().getColumnTypeName(i + 1)));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
+    /**
+     * Author: Niklas Wiemer
+     * Fügt einen neuen Datensatz hinzu
+     * @param table
+     * @param content
+     * @throws SQLException
+     */
 
     public void insertToDB(String table, List<Object> content) throws SQLException {
         StringBuilder sql = new StringBuilder();
@@ -84,6 +87,7 @@ public class DbOperation {
                 sql.append(", ");
             }
         }
+        // INSERT INTO tabelle VALUES(?, ?, ?, ?)
         PreparedStatement statement = dbConnection.getConnection().prepareStatement("INSERT INTO " + table + " VALUES(" + sql + ")");
         for (int i = 0; i < content.size(); i++) {
             statement.setObject(i + 1, content.get(i));
@@ -91,8 +95,18 @@ public class DbOperation {
         statement.executeUpdate();
     }
 
+    /**
+     * Author: Niklas Wiemer
+     * Löscht einen Datensatz
+     * @param table
+     * @param data
+     * @throws SQLException
+     */
+
     public void deleteFromDB(String table, Map<String, Object> data) throws SQLException {
         StringBuilder sql = new StringBuilder();
+
+        // vorname = ? AND nachname = ?
 
         int index = 0;
         for (String key : data.keySet()) {

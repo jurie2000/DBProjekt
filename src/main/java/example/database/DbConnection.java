@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class DbConnection {
 
     private final String url, password, userid;
-    ;
+
     private Connection connection;
 
     public DbConnection(String url, String userid, String password) {
@@ -16,41 +16,32 @@ public class DbConnection {
         this.password = password;
     }
 
-
-    public boolean connectToDb() {
+    /**
+     * Author: Justin Riedel
+     * stellt eine Verbindung zur Datenbank her
+     */
+    public void connectToDb() {
         try {
-            connection = DriverManager.getConnection(getUrl(), getUserid(), getPassword());
+            connection = DriverManager.getConnection(url, userid, password);
         } catch (SQLException exception) {
             exception.printStackTrace();
-            return false;
         }
-        return true;
     }
 
+    /**
+     * Author: Justin Riedel
+     * Schließt die Verbindung zur Datenbank
+     */
 
-    public boolean disconnectFromDb() {   //ToDO: Abfragen ob DB schon offen ist
+    public void disconnectFromDb() {
         try {
             if (connection.isClosed()) {
-                return true;
+                return;
             }
             connection.close();
         } catch (SQLException exception) {
-            return false;
-
+            exception.printStackTrace();
         }
-        return true;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public String getUserid() {
-        return userid;
     }
 
     public Connection getConnection() {
